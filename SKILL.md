@@ -37,7 +37,7 @@ Feature folders follow: `pages/` (routed), `components/` (non-routed), `guards/`
 - Optional chaining (`?.`) and nullish coalescing (`??`)
 - Template literals for string interpolation
 - Always declare methods and properties explicitly as `public` or `private` — never rely on implicit public
-- Prefix private properties and methods with underscore: `private _state`, `private _handleClick()`
+- Prefix private properties with underscore: `private _state`, `private readonly _http = inject(HttpClient)`
 - Use `private readonly` for all DI injections: `private readonly _http = inject(HttpClient)`
 - File structure: imports, class, properties, lifecycle, public methods, private methods
 
