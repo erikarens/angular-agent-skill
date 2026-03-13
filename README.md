@@ -1,6 +1,6 @@
 # Angular Development Skill
 
-A comprehensive [Claude Code Agent Skill](https://docs.anthropic.com/en/docs/claude-code/skills) for modern Angular development. Provides expert guidance on signals, standalone components, built-in control flow, and TypeScript best practices.
+A comprehensive [Claude Code Agent Skill](https://docs.anthropic.com/en/docs/claude-code/skills) for modern Angular development. Provides expert guidance on signals, standalone components, built-in control flow, accessibility (a11y), and TypeScript best practices.
 
 ## What It Does
 
@@ -12,6 +12,7 @@ This skill transforms Claude into an Angular expert that follows modern conventi
 - Follow your project's folder structure conventions
 - Use `inject()` for dependency injection, functional guards/interceptors, and modern routing patterns
 - Optimize performance with `@defer`, `NgOptimizedImage`, and `takeUntilDestroyed()`
+- Build **accessible components** using CDK a11y: focus traps, screen reader announcements, keyboard navigation, and ARIA patterns
 
 ## Coverage
 
@@ -26,6 +27,7 @@ This skill transforms Claude into an Angular expert that follows modern conventi
 | **DI & HTTP** | `inject()`, `provideHttpClient()`, functional interceptors, `firstValueFrom` |
 | **Routing** | Lazy loading, functional guards, `withComponentInputBinding()`, `withViewTransitions()` |
 | **SSR** | `RenderMode`, hydration, `afterNextRender()`, `withEventReplay()` |
+| **Accessibility** | CDK a11y, ARIA binding, FocusTrap, LiveAnnouncer, FocusMonitor, KeyManagers, accessible forms |
 | **App Config** | Full `app.config.ts` pattern with all modern providers |
 
 ### Reference Files (loaded on demand)
@@ -34,6 +36,7 @@ This skill transforms Claude into an Angular expert that follows modern conventi
 |------|----------|
 | `references/signals.md` | Full signal API reference, `linkedSignal` patterns, `resource`/`rxResource`, `effect` cleanup, RxJS interop (`toSignal`/`toObservable`), decorator migration table |
 | `references/templates.md` | Control flow details, `@defer` triggers & sub-blocks, `NgOptimizedImage`, SSR behavior, accessibility patterns, testing deferred views |
+| `references/accessibility.md` | CDK a11y full API: FocusTrap, FocusMonitor, LiveAnnouncer, AriaDescriber, KeyManagers, InteractivityChecker, InputModalityDetector, HighContrastModeDetector, accessible component patterns |
 
 ## Install
 
@@ -69,14 +72,20 @@ Claude will create a feature folder with `loadComponent`, functional guards, and
 
 Claude will use `linkedSignal()` to create a writable signal that auto-resets when the source changes, preserving the selection when possible.
 
+**Accessibility:**
+> "Make this dialog accessible with focus trapping and screen reader support"
+
+Claude will use `CdkTrapFocus`, `LiveAnnouncer`, proper ARIA attributes (`role="dialog"`, `aria-modal`, `aria-labelledby`), and focus restoration on close.
+
 ## Skill Structure
 
 ```
-angular-development/
-├── SKILL.md                  # Core instructions (~330 lines)
+angular-agent-skill/
+├── SKILL.md                  # Core instructions (~420 lines)
 └── references/
-    ├── signals.md             # Signal API deep-dive (~250 lines)
-    └── templates.md           # Template patterns deep-dive (~200 lines)
+    ├── signals.md             # Signal API deep-dive (~400 lines)
+    ├── templates.md           # Template patterns deep-dive (~220 lines)
+    └── accessibility.md       # CDK a11y reference (~350 lines)
 ```
 
 ## Angular Version

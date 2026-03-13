@@ -1,6 +1,6 @@
 ---
 name: angular-agent-skill
-description: Expert Angular, TypeScript, and Tailwind development with modern signal-based patterns, standalone components, and built-in control flow. Use when working on Angular projects, creating components, services, directives, pipes, writing templates, managing state with signals, handling forms, routing, HTTP requests, testing, or any Angular-related code. Also use when reviewing Angular code, debugging Angular issues, or making architectural decisions in Angular applications.
+description: Expert Angular, TypeScript, and Tailwind development with modern signal-based patterns, standalone components, and built-in control flow. Use when working on Angular projects, creating components, services, directives, pipes, writing templates, managing state with signals, handling forms, routing, HTTP requests, testing, accessibility (a11y), ARIA, or any Angular-related code. Also use when reviewing Angular code, debugging Angular issues, making architectural decisions, or implementing accessible UI patterns like focus traps, screen reader announcements, keyboard navigation, or ARIA attributes in Angular applications.
 ---
 
 # Angular Development
@@ -334,6 +334,83 @@ export const appConfig: ApplicationConfig = {
 - Signals automatically optimize re-renders with granular tracking
 - `takeUntilDestroyed()` to prevent subscription memory leaks
 
+## Accessibility (a11y)
+
+Use semantic HTML first. Add ARIA attributes only when native elements aren't sufficient. Always bind ARIA attributes with `[attr.aria-*]` (not `[aria-*]`) since they have no DOM properties.
+
+### CDK a11y Module
+
+Import from `@angular/cdk/a11y`. Services are `providedIn: 'root'` — no module import needed. For directives in standalone components, import them directly:
+
+```typescript
+import { CdkTrapFocus, CdkMonitorFocus, CdkAriaLive } from '@angular/cdk/a11y';
+```
+
+### Focus Management
+
+Use `CdkTrapFocus` for modals/dialogs to trap Tab focus. Use `cdkFocusInitial` to mark the initial focus target:
+
+```html
+<div role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId"
+     cdkTrapFocus [cdkTrapFocusAutoCapture]="true">
+  <h2 [id]="titleId">{{ title() }}</h2>
+  <input cdkFocusInitial />
+  <button (click)="close()">Close</button>
+</div>
+```
+
+Use `FocusMonitor` to detect how an element received focus and show keyboard-only focus rings:
+
+```typescript
+private focusMonitor = inject(FocusMonitor);
+// focusMonitor.monitor(el) → Observable<FocusOrigin>
+// focusMonitor.focusVia(el, 'keyboard') → programmatic focus with origin
+```
+
+### Screen Reader Announcements
+
+Use `LiveAnnouncer` for dynamic status updates:
+
+```typescript
+private liveAnnouncer = inject(LiveAnnouncer);
+this.liveAnnouncer.announce('Item saved', 'polite');    // Waits for current speech
+this.liveAnnouncer.announce('Error occurred', 'assertive'); // Interrupts
+```
+
+Or `CdkAriaLive` in templates: `<div [cdkAriaLive]="'polite'">{{ status() }}</div>`
+
+### Keyboard Navigation
+
+`FocusKeyManager` — roving tabindex pattern (moves DOM focus between items):
+
+```typescript
+keyManager = new FocusKeyManager(this.items()).withWrap().withVerticalOrientation();
+// Items implement: focus(), disabled?, getLabel?()
+```
+
+`ActiveDescendantKeyManager` — uses `aria-activedescendant` (focus stays on host, e.g. combobox):
+
+```typescript
+keyManager = new ActiveDescendantKeyManager(this.options()).withWrap().withTypeAhead();
+// Items implement: setActiveStyles(), setInactiveStyles(), disabled?
+// Host: [attr.aria-activedescendant]="keyManager.activeItem?.id"
+```
+
+### Accessible Forms
+
+```html
+<label for="email">Email</label>
+<input id="email" type="email"
+  [attr.aria-invalid]="emailInvalid() ? 'true' : null"
+  [attr.aria-describedby]="emailInvalid() ? 'email-error' : null"
+  [attr.aria-required]="'true'" />
+@if (emailInvalid()) {
+  <span id="email-error" role="alert">Please enter a valid email.</span>
+}
+```
+
+For detailed a11y patterns and full API reference, see [references/accessibility.md](references/accessibility.md).
+
 ## Security
 
 - Never use `innerHTML` — rely on Angular's built-in sanitization
@@ -362,3 +439,4 @@ Use `afterNextRender()` for browser-only code. `@defer` blocks render `@placehol
 
 - **[references/signals.md](references/signals.md)** — Detailed signal API reference, patterns for resource, linkedSignal, effect cleanup, and RxJS interop
 - **[references/templates.md](references/templates.md)** — Control flow details, @defer triggers, SSR considerations, and template best practices
+- **[references/accessibility.md](references/accessibility.md)** — CDK a11y full API reference: FocusTrap, FocusMonitor, LiveAnnouncer, AriaDescriber, KeyManagers, InteractivityChecker, InputModalityDetector, HighContrastModeDetector, and accessible component patterns
