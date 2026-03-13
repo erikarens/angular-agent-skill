@@ -1,4 +1,6 @@
-# Angular Accessibility — Detailed Reference
+# Angular Accessibility — CDK a11y Detailed Reference
+
+This file covers **low-level accessibility utilities** from `@angular/cdk/a11y`. For **high-level headless accessible components** (Tabs, Accordion, Menu, Listbox, Select, Autocomplete, Grid, Tree, Toolbar, Menubar, Multiselect, Combobox), see [angular-aria.md](angular-aria.md).
 
 ## Table of Contents
 

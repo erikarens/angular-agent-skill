@@ -1,6 +1,6 @@
 ---
 name: angular-agent-skill
-description: Expert Angular, TypeScript, and Tailwind development with modern signal-based patterns, standalone components, and built-in control flow. Use when working on Angular projects, creating components, services, directives, pipes, writing templates, managing state with signals, handling forms, routing, HTTP requests, testing, accessibility (a11y), ARIA, or any Angular-related code. Also use when reviewing Angular code, debugging Angular issues, making architectural decisions, or implementing accessible UI patterns like focus traps, screen reader announcements, keyboard navigation, or ARIA attributes in Angular applications.
+description: Expert Angular, TypeScript, and Tailwind development with modern signal-based patterns, standalone components, and built-in control flow. Use when working on Angular projects, creating components, services, directives, pipes, writing templates, managing state with signals, handling forms, routing, HTTP requests, testing, accessibility (a11y), ARIA, or any Angular-related code. Also use when reviewing Angular code, debugging Angular issues, making architectural decisions, or implementing accessible UI patterns like focus traps, screen reader announcements, keyboard navigation, or ARIA attributes in Angular applications. Use this skill whenever building headless accessible components with @angular/aria — including tabs, accordions, menus, menubars, toolbars, listboxes, select dropdowns, multiselect, autocomplete, combobox, grids, or tree views — even if the user doesn't explicitly mention "aria" or "accessibility".
 ---
 
 # Angular Development
@@ -338,9 +338,56 @@ export const appConfig: ApplicationConfig = {
 
 Use semantic HTML first. Add ARIA attributes only when native elements aren't sufficient. Always bind ARIA attributes with `[attr.aria-*]` (not `[aria-*]`) since they have no DOM properties.
 
+### @angular/aria — Headless Accessible Components
+
+For common interactive UI patterns, use `@angular/aria` (`npm install @angular/aria`). These headless directives implement WAI-ARIA patterns with full keyboard navigation, ARIA attributes, and focus management built in — you provide HTML structure and CSS styling.
+
+Available components:
+
+| Need | Component | Import |
+|------|-----------|--------|
+| Collapsible sections | Accordion | `@angular/aria/accordion` |
+| Tabbed panels | Tabs | `@angular/aria/tabs` |
+| Selection list | Listbox | `@angular/aria/listbox` |
+| Dropdown (<20 options) | Select | `@angular/aria/combobox` + `listbox` |
+| Multi-select dropdown | Multiselect | `@angular/aria/combobox` + `listbox` |
+| Searchable dropdown | Autocomplete | `@angular/aria/combobox` + `listbox` |
+| Context/action menu | Menu | `@angular/aria/menu` |
+| Navigation bar | Menubar | `@angular/aria/menu` |
+| Grouped actions | Toolbar | `@angular/aria/toolbar` |
+| Interactive table/calendar | Grid | `@angular/aria/grid` |
+| Hierarchical data | Tree | `@angular/aria/tree` |
+
+All components are headless (bring your own styles), support RTL, use Angular signals for state, and import directly into standalone components.
+
+```typescript
+// Example: Accessible tabs with @angular/aria
+import { Tabs, TabList, Tab, TabPanel, TabContent } from '@angular/aria/tabs';
+
+@Component({
+  imports: [Tabs, TabList, Tab, TabPanel, TabContent],
+  template: `
+    <div ngTabs>
+      <div ngTabList selectionMode="follow" selectedTab="general">
+        <div ngTab value="general">General</div>
+        <div ngTab value="security">Security</div>
+      </div>
+      <div ngTabPanel [preserveContent]="true" value="general">
+        <ng-template ngTabContent>General settings</ng-template>
+      </div>
+      <div ngTabPanel [preserveContent]="true" value="security">
+        <ng-template ngTabContent>Security settings</ng-template>
+      </div>
+    </div>
+  `,
+})
+```
+
+For detailed API reference, inputs, keyboard interactions, and examples for all components, see [references/angular-aria.md](references/angular-aria.md).
+
 ### CDK a11y Module
 
-Import from `@angular/cdk/a11y`. Services are `providedIn: 'root'` — no module import needed. For directives in standalone components, import them directly:
+For lower-level accessibility utilities (focus traps, focus monitoring, screen reader announcements, custom keyboard navigation), use `@angular/cdk/a11y`. Services are `providedIn: 'root'` — no module import needed:
 
 ```typescript
 import { CdkTrapFocus, CdkMonitorFocus, CdkAriaLive } from '@angular/cdk/a11y';
@@ -409,7 +456,7 @@ keyManager = new ActiveDescendantKeyManager(this.options()).withWrap().withTypeA
 }
 ```
 
-For detailed a11y patterns and full API reference, see [references/accessibility.md](references/accessibility.md).
+For detailed CDK a11y patterns and full API reference, see [references/accessibility.md](references/accessibility.md).
 
 ## Security
 
@@ -439,4 +486,5 @@ Use `afterNextRender()` for browser-only code. `@defer` blocks render `@placehol
 
 - **[references/signals.md](references/signals.md)** — Detailed signal API reference, patterns for resource, linkedSignal, effect cleanup, and RxJS interop
 - **[references/templates.md](references/templates.md)** — Control flow details, @defer triggers, SSR considerations, and template best practices
-- **[references/accessibility.md](references/accessibility.md)** — CDK a11y full API reference: FocusTrap, FocusMonitor, LiveAnnouncer, AriaDescriber, KeyManagers, InteractivityChecker, InputModalityDetector, HighContrastModeDetector, and accessible component patterns
+- **[references/angular-aria.md](references/angular-aria.md)** — `@angular/aria` headless accessible components: Accordion, Tabs, Listbox, Select, Multiselect, Autocomplete, Combobox, Menu, Menubar, Toolbar, Grid, Tree — with full API, inputs, keyboard interactions, and examples
+- **[references/accessibility.md](references/accessibility.md)** — CDK a11y utilities: FocusTrap, FocusMonitor, LiveAnnouncer, AriaDescriber, KeyManagers, InteractivityChecker, InputModalityDetector, HighContrastModeDetector, and accessible component patterns
