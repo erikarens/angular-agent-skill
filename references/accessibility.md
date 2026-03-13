@@ -82,19 +82,19 @@ import { FocusTrapFactory, FocusTrap } from '@angular/cdk/a11y';
 
 @Component({...})
 export class DialogComponent {
-  private focusTrapFactory = inject(FocusTrapFactory);
-  private dialogEl = viewChild.required<ElementRef>('dialog');
-  private focusTrap!: FocusTrap;
+  private readonly _focusTrapFactory = inject(FocusTrapFactory);
+  private _dialogEl = viewChild.required<ElementRef>('dialog');
+  private _focusTrap!: FocusTrap;
 
   constructor() {
     afterNextRender(() => {
-      this.focusTrap = this.focusTrapFactory.create(this.dialogEl().nativeElement);
-      this.focusTrap.focusInitialElementWhenReady();
+      this._focusTrap = this._focusTrapFactory.create(this._dialogEl().nativeElement);
+      this._focusTrap.focusInitialElementWhenReady();
     });
   }
 
-  close() {
-    this.focusTrap.destroy();
+  public close() {
+    this._focusTrap.destroy();
   }
 }
 ```
@@ -147,12 +147,12 @@ import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 
 @Component({...})
 export class MyComponent {
-  private focusMonitor = inject(FocusMonitor);
-  private buttonEl = viewChild.required<ElementRef>('btn');
+  private readonly _focusMonitor = inject(FocusMonitor);
+  private _buttonEl = viewChild.required<ElementRef>('btn');
 
   constructor() {
     afterNextRender(() => {
-      this.focusMonitor.monitor(this.buttonEl())
+      this._focusMonitor.monitor(this._buttonEl())
         .pipe(takeUntilDestroyed())
         .subscribe((origin: FocusOrigin) => {
           // origin: 'mouse' | 'keyboard' | 'touch' | 'program' | null
@@ -161,8 +161,8 @@ export class MyComponent {
   }
 
   // Programmatic focus with explicit origin
-  focusViaKeyboard() {
-    this.focusMonitor.focusVia(this.buttonEl(), 'keyboard');
+  public focusViaKeyboard() {
+    this._focusMonitor.focusVia(this._buttonEl(), 'keyboard');
   }
 }
 ```
@@ -184,21 +184,21 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 @Component({...})
 export class CartComponent {
-  private liveAnnouncer = inject(LiveAnnouncer);
+  private readonly _liveAnnouncer = inject(LiveAnnouncer);
 
-  addToCart(item: string) {
+  public addToCart(item: string) {
     // Polite announcement (default) — waits for current speech to finish
-    this.liveAnnouncer.announce(`${item} added to cart`);
+    this._liveAnnouncer.announce(`${item} added to cart`);
   }
 
-  showError(message: string) {
+  public showError(message: string) {
     // Assertive — interrupts current speech
-    this.liveAnnouncer.announce(message, 'assertive');
+    this._liveAnnouncer.announce(message, 'assertive');
   }
 
-  save() {
+  public save() {
     // Auto-clear after 3 seconds
-    this.liveAnnouncer.announce('Changes saved', 3000);
+    this._liveAnnouncer.announce('Changes saved', 3000);
   }
 }
 ```
@@ -238,18 +238,18 @@ import { AriaDescriber } from '@angular/cdk/a11y';
 
 @Component({...})
 export class TooltipDirective {
-  private ariaDescriber = inject(AriaDescriber);
-  private el = inject(ElementRef);
+  private readonly _ariaDescriber = inject(AriaDescriber);
+  private readonly _el = inject(ElementRef);
 
-  tooltipText = input.required<string>();
+  public tooltipText = input.required<string>();
 
   constructor() {
     effect(() => {
-      this.ariaDescriber.describe(this.el.nativeElement, this.tooltipText());
+      this._ariaDescriber.describe(this._el.nativeElement, this.tooltipText());
     });
 
     inject(DestroyRef).onDestroy(() => {
-      this.ariaDescriber.removeDescription(this.el.nativeElement, this.tooltipText());
+      this._ariaDescriber.removeDescription(this._el.nativeElement, this.tooltipText());
     });
   }
 }
@@ -291,12 +291,12 @@ interface FocusableOption {
   `,
 })
 export class MenuComponent {
-  items = contentChildren(MenuItemComponent);
-  private keyManager!: FocusKeyManager<MenuItemComponent>;
+  public items = contentChildren(MenuItemComponent);
+  private _keyManager!: FocusKeyManager<MenuItemComponent>;
 
   constructor() {
     afterNextRender(() => {
-      this.keyManager = new FocusKeyManager(this.items())
+      this._keyManager = new FocusKeyManager(this.items())
         .withWrap()
         .withVerticalOrientation()
         .withHomeAndEnd()
@@ -304,8 +304,8 @@ export class MenuComponent {
     });
   }
 
-  onKeydown(event: KeyboardEvent) {
-    this.keyManager.onKeydown(event);
+  public onKeydown(event: KeyboardEvent) {
+    this._keyManager.onKeydown(event);
   }
 }
 
@@ -314,11 +314,11 @@ export class MenuComponent {
   template: `<li role="menuitem" tabindex="-1" #el><ng-content /></li>`,
 })
 export class MenuItemComponent implements FocusableOption {
-  private element = viewChild.required<ElementRef>('el');
-  disabled = false;
+  private _element = viewChild.required<ElementRef>('el');
+  public disabled = false;
 
-  focus() { this.element().nativeElement.focus(); }
-  getLabel() { return this.element().nativeElement.textContent?.trim() ?? ''; }
+  public focus() { this._element().nativeElement.focus(); }
+  public getLabel() { return this._element().nativeElement.textContent?.trim() ?? ''; }
 }
 ```
 
@@ -350,12 +350,12 @@ interface Highlightable {
   `,
 })
 export class ListboxComponent {
-  options = contentChildren(ListboxOptionComponent);
-  keyManager!: ActiveDescendantKeyManager<ListboxOptionComponent>;
+  public options = contentChildren(ListboxOptionComponent);
+  private _keyManager!: ActiveDescendantKeyManager<ListboxOptionComponent>;
 
   constructor() {
     afterNextRender(() => {
-      this.keyManager = new ActiveDescendantKeyManager(this.options())
+      this._keyManager = new ActiveDescendantKeyManager(this.options())
         .withWrap()
         .withVerticalOrientation()
         .withHomeAndEnd()
@@ -363,9 +363,9 @@ export class ListboxComponent {
     });
   }
 
-  onFocus() {
-    if (!this.keyManager.activeItem) {
-      this.keyManager.setFirstItemActive();
+  public onFocus() {
+    if (!this._keyManager.activeItem) {
+      this._keyManager.setFirstItemActive();
     }
   }
 }
@@ -381,14 +381,14 @@ export class ListboxComponent {
   `,
 })
 export class ListboxOptionComponent implements Highlightable {
-  private static nextId = 0;
-  id = `listbox-option-${ListboxOptionComponent.nextId++}`;
-  disabled = false;
-  isActive = false;
+  private static _nextId = 0;
+  public id = `listbox-option-${ListboxOptionComponent._nextId++}`;
+  public disabled = false;
+  public isActive = false;
 
-  setActiveStyles() { this.isActive = true; }
-  setInactiveStyles() { this.isActive = false; }
-  getLabel() { return inject(ElementRef).nativeElement.textContent?.trim() ?? ''; }
+  public setActiveStyles() { this.isActive = true; }
+  public setInactiveStyles() { this.isActive = false; }
+  public getLabel() { return inject(ElementRef).nativeElement.textContent?.trim() ?? ''; }
 }
 ```
 
@@ -426,16 +426,16 @@ import { InteractivityChecker } from '@angular/cdk/a11y';
 
 @Component({...})
 export class MyComponent {
-  private checker = inject(InteractivityChecker);
+  private readonly _checker = inject(InteractivityChecker);
 
-  checkElement(el: HTMLElement) {
-    this.checker.isFocusable(el);    // Can receive focus via script
-    this.checker.isTabbable(el);     // Can receive focus via Tab key
-    this.checker.isVisible(el);      // Not display:none or hidden attribute
-    this.checker.isDisabled(el);     // Has disabled attribute
+  public checkElement(el: HTMLElement) {
+    this._checker.isFocusable(el);    // Can receive focus via script
+    this._checker.isTabbable(el);     // Can receive focus via Tab key
+    this._checker.isVisible(el);      // Not display:none or hidden attribute
+    this._checker.isDisabled(el);     // Has disabled attribute
 
     // Check focusability ignoring current visibility
-    this.checker.isFocusable(el, { ignoreVisibility: true });
+    this._checker.isFocusable(el, { ignoreVisibility: true });
   }
 }
 ```
@@ -449,10 +449,10 @@ import { InputModalityDetector, InputModality } from '@angular/cdk/a11y';
 
 @Component({...})
 export class AppComponent {
-  private detector = inject(InputModalityDetector);
+  private readonly _detector = inject(InputModalityDetector);
 
   constructor() {
-    this.detector.modalityDetected
+    this._detector.modalityDetected
       .pipe(takeUntilDestroyed())
       .subscribe((modality: InputModality) => {
         // 'keyboard' | 'mouse' | 'touch' | null
@@ -461,7 +461,7 @@ export class AppComponent {
   }
 
   // Check current modality synchronously
-  get isKeyboard() { return this.detector.mostRecentModality === 'keyboard'; }
+  public get isKeyboard() { return this._detector.mostRecentModality === 'keyboard'; }
 }
 ```
 
@@ -482,8 +482,8 @@ import { HighContrastModeDetector, HighContrastMode } from '@angular/cdk/a11y';
 
 @Component({...})
 export class MyComponent {
-  private hcDetector = inject(HighContrastModeDetector);
-  isHighContrast = this.hcDetector.getHighContrastMode() !== HighContrastMode.NONE;
+  private readonly _hcDetector = inject(HighContrastModeDetector);
+  public isHighContrast = this._hcDetector.getHighContrastMode() !== HighContrastMode.NONE;
 }
 ```
 
@@ -521,20 +521,20 @@ CSS classes automatically added to `<body>`:
   `,
 })
 export class DialogComponent {
-  title = input.required<string>();
-  closed = output<void>();
+  public title = input.required<string>();
+  public closed = output<void>();
 
-  private liveAnnouncer = inject(LiveAnnouncer);
-  private previousFocus = document.activeElement as HTMLElement;
-  private titleId = `dialog-title-${crypto.randomUUID()}`;
+  private readonly _liveAnnouncer = inject(LiveAnnouncer);
+  private _previousFocus = document.activeElement as HTMLElement;
+  private _titleId = `dialog-title-${crypto.randomUUID()}`;
 
   constructor() {
-    this.liveAnnouncer.announce(`Dialog opened: ${this.title()}`);
+    this._liveAnnouncer.announce(`Dialog opened: ${this.title()}`);
   }
 
-  close() {
-    this.liveAnnouncer.announce('Dialog closed');
-    this.previousFocus?.focus();
+  public close() {
+    this._liveAnnouncer.announce('Dialog closed');
+    this._previousFocus?.focus();
     this.closed.emit();
   }
 }
@@ -558,7 +558,7 @@ export class DialogComponent {
   `,
 })
 export class SmartButtonComponent {
-  focusOrigin = signal<FocusOrigin>(null);
+  public focusOrigin = signal<FocusOrigin>(null);
 }
 ```
 
@@ -576,16 +576,16 @@ export class SmartButtonComponent {
   `,
 })
 export class AppComponent {
-  private router = inject(Router);
-  private focusMonitor = inject(FocusMonitor);
-  private mainContent = viewChild.required<ElementRef>('mainContent');
+  private readonly _router = inject(Router);
+  private readonly _focusMonitor = inject(FocusMonitor);
+  private _mainContent = viewChild.required<ElementRef>('mainContent');
 
   constructor() {
-    this.router.events.pipe(
+    this._router.events.pipe(
       filter(e => e instanceof NavigationEnd),
       takeUntilDestroyed(),
     ).subscribe(() => {
-      this.focusMonitor.focusVia(this.mainContent(), 'program');
+      this._focusMonitor.focusVia(this._mainContent(), 'program');
     });
   }
 }
@@ -609,16 +609,16 @@ export class AppComponent {
   `,
 })
 export class ContentComponent {
-  private liveAnnouncer = inject(LiveAnnouncer);
-  isLoading = signal(true);
-  content = signal('');
+  private readonly _liveAnnouncer = inject(LiveAnnouncer);
+  public isLoading = signal(true);
+  public content = signal('');
 
-  async load() {
+  public async load() {
     this.isLoading.set(true);
-    this.liveAnnouncer.announce('Loading content');
+    this._liveAnnouncer.announce('Loading content');
     // ... fetch data
     this.isLoading.set(false);
-    this.liveAnnouncer.announce('Content loaded');
+    this._liveAnnouncer.announce('Content loaded');
   }
 }
 ```
@@ -671,12 +671,12 @@ export class ComboboxComponent {
 ```
 
 ```typescript
-onSort(column: string, direction: string) {
-  this.tableAnnouncement.set(`Table sorted by ${column}, ${direction}`);
+public onSort(column: string, direction: string) {
+  this._tableAnnouncement.set(`Table sorted by ${column}, ${direction}`);
 }
 
-onFilter(count: number) {
-  this.tableAnnouncement.set(`Showing ${count} results`);
+public onFilter(count: number) {
+  this._tableAnnouncement.set(`Showing ${count} results`);
 }
 ```
 

@@ -36,6 +36,9 @@ Feature folders follow: `pages/` (routed), `components/` (non-routed), `guards/`
 - Strict typing, never use `any` — define explicit types
 - Optional chaining (`?.`) and nullish coalescing (`??`)
 - Template literals for string interpolation
+- Always declare methods and properties explicitly as `public` or `private` — never rely on implicit public
+- Prefix private properties and methods with underscore: `private _state`, `private _handleClick()`
+- Use `private readonly` for all DI injections: `private readonly _http = inject(HttpClient)`
 - File structure: imports, class, properties, lifecycle, public methods, private methods
 
 ## Signals (State Management)
@@ -215,12 +218,12 @@ export class UserCardComponent {
 
 ### Dependency Injection
 
-Use `inject()` function, not constructor injection:
+Use `inject()` function, not constructor injection. Always use `private readonly` with underscore prefix:
 
 ```typescript
 export class UserService {
-  private readonly http = inject(HttpClient);
-  private readonly config = inject(ConfigService);
+  private readonly _http = inject(HttpClient);
+  private readonly _config = inject(ConfigService);
 }
 ```
 
@@ -231,9 +234,9 @@ Services use `providedIn: 'root'` for tree-shakeable singletons.
 Convert observables to promises with `firstValueFrom`:
 
 ```typescript
-async getUser(id: string): Promise<User> {
+public async getUser(id: string): Promise<User> {
   return firstValueFrom(
-    this.http.get<User>(`/api/users/${id}`)
+    this._http.get<User>(`/api/users/${id}`)
   );
 }
 ```
@@ -269,9 +272,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 this.route.params.pipe(takeUntilDestroyed()).subscribe(/*...*/);
 
 // Outside constructor — pass DestroyRef
-private destroyRef = inject(DestroyRef);
-ngOnInit() {
-  this.obs$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(/*...*/);
+private readonly _destroyRef = inject(DestroyRef);
+public ngOnInit() {
+  this.obs$.pipe(takeUntilDestroyed(this._destroyRef)).subscribe(/*...*/);
 }
 ```
 
@@ -409,9 +412,9 @@ Use `CdkTrapFocus` for modals/dialogs to trap Tab focus. Use `cdkFocusInitial` t
 Use `FocusMonitor` to detect how an element received focus and show keyboard-only focus rings:
 
 ```typescript
-private focusMonitor = inject(FocusMonitor);
-// focusMonitor.monitor(el) → Observable<FocusOrigin>
-// focusMonitor.focusVia(el, 'keyboard') → programmatic focus with origin
+private readonly _focusMonitor = inject(FocusMonitor);
+// _focusMonitor.monitor(el) → Observable<FocusOrigin>
+// _focusMonitor.focusVia(el, 'keyboard') → programmatic focus with origin
 ```
 
 ### Screen Reader Announcements
@@ -419,9 +422,9 @@ private focusMonitor = inject(FocusMonitor);
 Use `LiveAnnouncer` for dynamic status updates:
 
 ```typescript
-private liveAnnouncer = inject(LiveAnnouncer);
-this.liveAnnouncer.announce('Item saved', 'polite');    // Waits for current speech
-this.liveAnnouncer.announce('Error occurred', 'assertive'); // Interrupts
+private readonly _liveAnnouncer = inject(LiveAnnouncer);
+this._liveAnnouncer.announce('Item saved', 'polite');    // Waits for current speech
+this._liveAnnouncer.announce('Error occurred', 'assertive'); // Interrupts
 ```
 
 Or `CdkAriaLive` in templates: `<div [cdkAriaLive]="'polite'">{{ status() }}</div>`
